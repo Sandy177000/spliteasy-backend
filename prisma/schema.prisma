@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  uid           String   @unique // Firebase UID
+  email         String?   @unique
+  name          String?
+  profileImage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+model Group {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  members     String[]
+  createdBy   String
+  createdAt   DateTime @default(now())
+}
