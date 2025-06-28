@@ -1,5 +1,6 @@
 import admin from "firebase-admin";
 
+// not in use
 const serviceAccount = require("../config/serviceAccountKey.json");
 
 if (!admin.apps.length) {
