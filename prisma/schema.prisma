@@ -18,10 +18,13 @@ model User {
   updatedAt     DateTime @updatedAt
 }
 model Group {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  members     String[]
-  createdBy   String
-  createdAt   DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String?
+  members      String[]
+  createdBy    String
+  createdAt    DateTime @default(now())
+  totalBalance Float    @default(0)
+  currency     String?
+  imageUrl     String?
 }

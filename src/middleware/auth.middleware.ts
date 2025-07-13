@@ -1,14 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../services/jwt.service';
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-  };
-}
 
-export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const authMiddleWare = (req: any, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
