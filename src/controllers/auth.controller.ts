@@ -7,7 +7,7 @@ const prismaCient = getPrismaClient();
 
 interface LoginRequest extends Request {
   body: {
-    email: string;
+    phone: string;
     password: string;
   };
 }
@@ -16,6 +16,7 @@ interface SignupRequest extends Request {
   body: {
     name: string,
     email: string;
+    phone: string;
     password: string;
   };
 }
@@ -23,12 +24,12 @@ interface SignupRequest extends Request {
 export const login = async (req: LoginRequest, res: Response) => {
   try {
 
-    const { email, password } = req.body;
-    if (!email || !password)
+    const { phone, password } = req.body;
+    if (!phone || !password)
       return res.status(400).json({ error: "Email and password are required" });
 
     const user = await prismaCient.user.findUnique({
-      where: { email },
+      where: { phone },
     });
 
     if (!user) {
@@ -40,12 +41,13 @@ export const login = async (req: LoginRequest, res: Response) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    const accessToken = generateAccessToken({ userId: user.id, email: user.email });
+    const accessToken = generateAccessToken({ userId: user.id, phone: user.phone });
 
     return res.status(200).json({
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       profileImage: user.profileImage,
       accessToken
     });
@@ -55,17 +57,27 @@ export const login = async (req: LoginRequest, res: Response) => {
   }
 };
 
+
+/*
+ curl -X POST http://localhost:4000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "test_2",
+    "email": "2",
+    "password": "2"
+  }'
+*/
 export const signup = async (req: SignupRequest, res: Response) => {
   try {
-    const { name, email, password } = req.body;
-    if (!email || !password || !name)
+    const { name, phone, email, password } = req.body;
+    if (!phone || !password || !name)
       return res
         .status(400)
         .json({ error: "Name, email, and password are required" });
 
     const existingUser = await prismaCient.user.findUnique({
       where: {
-        email,
+        phone,
       },
     });
 
@@ -78,12 +90,13 @@ export const signup = async (req: SignupRequest, res: Response) => {
     const newUser = await prismaCient.user.create({
       data: {
         name,
+        phone,
         email,
         password: hashedPassword,
       },
     });
 
-    const accessToken = generateAccessToken({ userId: newUser.id, email: newUser.email });
+    const accessToken = generateAccessToken({ userId: newUser.id, phone: newUser.phone });
 
     return res.status(201).json({
       name: newUser.name,

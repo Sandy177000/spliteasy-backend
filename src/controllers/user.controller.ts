@@ -38,3 +38,13 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
     return res.status(500).json({ error: err.message });
   }
 }; 
+
+export const getAllUsers = async(req: Request, res: Response) => {
+  try {
+    const allUsers = await prismaClient.user.findMany();
+    return res.status(200).json(allUsers);
+  } catch (error: any) {
+    console.log("Error fetching users");
+    return res.status(500).json({error: error.message})
+  }
+}

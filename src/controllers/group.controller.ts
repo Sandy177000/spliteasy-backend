@@ -97,3 +97,37 @@ export const getGroupsOfUser = async (req: Request, res: Response<GroupResponseB
         return res.status(500).json({ error: error.message || 'Internal server error' });
     }
 }
+
+
+export const getGroupById = async (req: Request, res: Response) => {
+    try {
+        
+        const { id } = req.params;
+        if(_.isEmpty(id)) return res.status(400).json({ error : 'Error fetching group details'});
+
+        const groupById = await prismaClient.group.findUnique({ 
+            where :  { id } 
+        });
+
+        console.log(groupById);
+        return res.status(200).json(groupById);
+
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message || 'Internal server error'});
+    }
+}
+
+
+// curl -X DELETE http://localhost:4000/api/group/clear
+export const clearGroups = async (req: Request, res: Response) => {
+    try {
+        // Delete all expenses first due to foreign key constraints
+        await prismaClient.expense.deleteMany({});
+        // Delete all groups
+        await prismaClient.group.deleteMany({});
+        return res.status(200).json({ message: 'All groups and related expenses cleared.' });
+    } catch (error: any) {
+        console.error('Clear groups error:', error);
+        return res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+}

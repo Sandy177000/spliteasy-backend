@@ -10,21 +10,57 @@ datasource db {
 model User {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   email         String   @unique
+  phone         String   @unique
   name          String?
   password      String
   profileImage  String?
   refreshToken  String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  paidExpenses  Expense[] @relation("PaidBy")
+  createdExpenses Expense[] @relation("CreatedBy")
+  shares        Share[]
 }
 model Group {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   description  String?
   members      String[]
   createdBy    String
-  createdAt    DateTime @default(now())
-  totalBalance Float    @default(0)
+  createdAt    DateTime  @default(now())
+  totalBalance Float     @default(0)
   currency     String?
   imageUrl     String?
+  expenses     Expense[] // Relation to Expense
+}
+
+model Expense {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  description String
+  amount      Float
+  paidById    String    @db.ObjectId
+  paidBy      User      @relation("PaidBy", fields: [paidById], references: [id])
+  groupId     String?   @db.ObjectId
+  group       Group?    @relation(fields: [groupId], references: [id])
+  splitAmong  String[]  // Array of User IDs
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  currency    String    @default("INR")
+  notes       String?
+  imageUrl    String?
+  category    String?
+  createdById String?   @db.ObjectId
+  createdBy   User?     @relation("CreatedBy", fields: [createdById], references: [id])
+  deleted     Boolean   @default(false)
+  settled     Boolean   @default(false)
+  shares      Share[]   // Relation to Share
+}
+
+model Share {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  expenseId  String   @db.ObjectId
+  expense    Expense  @relation(fields: [expenseId], references: [id])
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  amount     Float
 }
